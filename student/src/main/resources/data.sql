@@ -1,0 +1,1 @@
+insert into student (id,name) values (10000,'test');
