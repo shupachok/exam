@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,11 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.supachok.exam.student.StudentRepository;
 import com.supachok.exam.student.entity.Student;
+import com.supachok.exam.student.repository.StudentRepository;
 
 @RestController
 public class StudentController {
+	
+	@Autowired
+	BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Autowired
 	StudentRepository studentRepository;
@@ -41,6 +45,8 @@ public class StudentController {
 
 	@PostMapping(value = "/students")
 	public ResponseEntity<Object> insertStudents(@RequestBody Student student) {
+		String encodedPassword = bCryptPasswordEncoder.encode(student.getPassword());
+		student.setPassword(encodedPassword);
 		Student studentInserted = studentRepository.save(student);
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{studentId}")
 				.buildAndExpand(studentInserted.getId()).toUri();
