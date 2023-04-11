@@ -44,14 +44,19 @@ public class WebSecurity {
 		
 		AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
 		
-		http.csrf().disable();
+        AuthenticationFilter authenticationFilter = 
+        		new AuthenticationFilter(authenticationManager,studentService,environment);
+        authenticationFilter.setFilterProcessesUrl(environment.getProperty("login.url.path"));
+       
+        http.csrf().disable();
+        
         http.authorizeHttpRequests()
-//        .requestMatchers(HttpMethod.POST, "/students**").permitAll()
+        .requestMatchers(HttpMethod.GET,"/students/**").permitAll()
 		.requestMatchers(HttpMethod.POST, "/students").access(
 				new WebExpressionAuthorizationManager("hasIpAddress('"+environment.getProperty("gateway.ip")+"')"))
         .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
         .and()
-        .addFilter(new AuthenticationFilter(authenticationManager,studentService,environment))
+        .addFilter(authenticationFilter)
         .authenticationManager(authenticationManager)
         .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 		
