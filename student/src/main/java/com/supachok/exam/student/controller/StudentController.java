@@ -3,10 +3,12 @@ package com.supachok.exam.student.controller;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +35,8 @@ public class StudentController {
 	}
 
 	@GetMapping(value = "/students/{id}")
-	public Student retrieveStudentsById(@PathVariable Long id) {
+	@PreAuthorize("principal == #id")
+	public Student retrieveStudentsById(@PathVariable UUID id) {
 		Optional<Student> student = studentServiceImpl.findStudentById(id);
 		if(student.isEmpty())
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -51,7 +54,8 @@ public class StudentController {
 	}
 
 	@PutMapping(value = "/students/{id}")
-	public ResponseEntity<Object> updateStudents(@PathVariable Long id, @RequestBody StudentDto student) {
+	@PreAuthorize("principal == #id")
+	public ResponseEntity<Object> updateStudents(@PathVariable UUID id, @RequestBody StudentDto student) {
 		Optional<Student> studentSearched = studentServiceImpl.findStudentById(id);
 		if (studentSearched.isEmpty())
 			return ResponseEntity.notFound().build();
@@ -62,7 +66,8 @@ public class StudentController {
 	}
 
 	@DeleteMapping(value = "/students/{id}")
-	public ResponseEntity<Object> deleteStudents(@PathVariable Long id) {
+	@PreAuthorize("principal == #id")
+	public ResponseEntity<Object> deleteStudents(@PathVariable UUID id) {
 		studentServiceImpl.deleteStudent(id);
 
 		return ResponseEntity.noContent().build();

@@ -1,1 +1,0 @@
-insert into student (id,name,email,password) values (10000,'test','tonaja@gmail.com','12341234');

@@ -1,5 +1,7 @@
 package com.supachok.exam.student.entity;
 
+import java.util.UUID;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -9,7 +11,7 @@ public class Student {
 
 	@Id
 	@GeneratedValue
-	Long id;
+	UUID id;
 
 	String name;
 
@@ -20,11 +22,11 @@ public class Student {
 	public Student() {
 	}
 
-	public Long getId() {
+	public UUID getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(UUID id) {
 		this.id = id;
 	}
 

@@ -6,6 +6,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -16,6 +17,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.supachok.exam.student.service.StudentService;
 
+@EnableMethodSecurity(prePostEnabled = true)
 @Configuration
 @EnableWebSecurity
 public class WebSecurity {
@@ -51,11 +53,11 @@ public class WebSecurity {
         http.csrf().disable();
         
         http.authorizeHttpRequests()
-        .requestMatchers(HttpMethod.GET,"/students/**").permitAll()
-		.requestMatchers(HttpMethod.POST, "/students").access(
+		.requestMatchers("/students/**").access(
 				new WebExpressionAuthorizationManager("hasIpAddress('"+environment.getProperty("gateway.ip")+"')"))
         .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
         .and()
+        .addFilter(new AuthorizationFilter(authenticationManager, environment))
         .addFilter(authenticationFilter)
         .authenticationManager(authenticationManager)
         .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

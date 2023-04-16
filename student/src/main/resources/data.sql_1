@@ -1,0 +1,1 @@
+insert into student (id,name,email,password) values ('cccccccc-cccc-cccc-cccc-cccccccccccc','test','tonaja@gmail.com','$2a$10$/X.ugE8Eu.yygsc/3GZeV.PUxnHxcfBh3ux6fgOvTWO3xH41CQP9.');

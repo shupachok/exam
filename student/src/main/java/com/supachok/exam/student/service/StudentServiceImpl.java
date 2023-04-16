@@ -3,6 +3,7 @@ package com.supachok.exam.student.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -55,7 +56,7 @@ public class StudentServiceImpl implements StudentService {
 		return studentRepository.findAll();
 	}
 
-	public Optional<Student> findStudentById(Long id) {
+	public Optional<Student> findStudentById(UUID id) {
 		return studentRepository.findById(id);
 	}
 
@@ -72,7 +73,7 @@ public class StudentServiceImpl implements StudentService {
 		student.setPassword(encodedPassword);
 	}
 
-	public void deleteStudent(Long id) {
+	public void deleteStudent(UUID id) {
 		studentRepository.deleteById(id);
 	}
 
