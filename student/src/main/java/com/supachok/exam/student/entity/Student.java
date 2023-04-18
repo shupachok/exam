@@ -1,32 +1,32 @@
 package com.supachok.exam.student.entity;
 
-import java.util.UUID;
-
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Student {
 
 	@Id
-	@GeneratedValue
-	UUID id;
+	String id;
 
 	String name;
 
 	String email;
 
 	String password;
+	
+	@ManyToOne
+	Role role;
 
 	public Student() {
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(UUID id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -52,6 +52,14 @@ public class Student {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
 	}
 
 	@Override

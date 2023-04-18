@@ -3,7 +3,6 @@ package com.supachok.exam.student.controller;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,13 +29,14 @@ public class StudentController {
 	StudentServiceImpl studentServiceImpl;
 
 	@GetMapping(value = "/students")
+	@PreAuthorize("hasRole('ADMIN')")
 	public List<Student> retrieveStudents() {
 		return studentServiceImpl.findAllStudent();
 	}
 
 	@GetMapping(value = "/students/{id}")
-	@PreAuthorize("principal == #id")
-	public Student retrieveStudentsById(@PathVariable UUID id) {
+	@PreAuthorize("hasRole('ADMIN') or principal == #id")
+	public Student retrieveStudentsById(@PathVariable String id) {
 		Optional<Student> student = studentServiceImpl.findStudentById(id);
 		if(student.isEmpty())
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -54,8 +54,8 @@ public class StudentController {
 	}
 
 	@PutMapping(value = "/students/{id}")
-	@PreAuthorize("principal == #id")
-	public ResponseEntity<Object> updateStudents(@PathVariable UUID id, @RequestBody StudentDto student) {
+	@PreAuthorize("hasRole('ADMIN') or principal == #id")
+	public ResponseEntity<Object> updateStudents(@PathVariable String id, @RequestBody StudentDto student) {
 		Optional<Student> studentSearched = studentServiceImpl.findStudentById(id);
 		if (studentSearched.isEmpty())
 			return ResponseEntity.notFound().build();
@@ -66,8 +66,8 @@ public class StudentController {
 	}
 
 	@DeleteMapping(value = "/students/{id}")
-	@PreAuthorize("principal == #id")
-	public ResponseEntity<Object> deleteStudents(@PathVariable UUID id) {
+	@PreAuthorize("hasRole('ADMIN') or principal == #id")
+	public ResponseEntity<Object> deleteStudents(@PathVariable String id) {
 		studentServiceImpl.deleteStudent(id);
 
 		return ResponseEntity.noContent().build();

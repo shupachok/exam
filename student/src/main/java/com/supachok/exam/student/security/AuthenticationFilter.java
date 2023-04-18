@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.supachok.exam.student.constant.SystemConstant;
 import com.supachok.exam.student.entity.Student;
 import com.supachok.exam.student.model.LoginRequestModel;
 import com.supachok.exam.student.service.StudentService;
@@ -67,10 +68,13 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		SecretKey secretKey = new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS512.getJcaName());
 
 		Instant now = Instant.now();
-		String token = Jwts.builder().setSubject(username).setSubject(studentDetails.getId().toString())
+		String token = Jwts.builder()
+				.setSubject(studentDetails.getId())
+				.claim("role", SystemConstant.ROLE_PREFIX + studentDetails.getRole().getName())
 				.setExpiration(
 						Date.from(now.plusMillis(Long.parseLong(environment.getProperty("token.expiration_time")))))
-				.setIssuedAt(Date.from(now)).signWith(secretKey, SignatureAlgorithm.HS512).compact();
+				.setIssuedAt(Date.from(now))
+				.signWith(secretKey, SignatureAlgorithm.HS512).compact();
 
 		res.addHeader("token", token);
 		res.addHeader("userId", studentDetails.getId().toString());
