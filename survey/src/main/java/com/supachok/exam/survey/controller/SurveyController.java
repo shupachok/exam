@@ -24,6 +24,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.supachok.exam.survey.dto.OptionDto;
 import com.supachok.exam.survey.dto.QuestionDto;
 import com.supachok.exam.survey.dto.SurveyDto;
+import com.supachok.exam.survey.dto.SurveyFetchDataDto;
 import com.supachok.exam.survey.entity.Option;
 import com.supachok.exam.survey.entity.Question;
 import com.supachok.exam.survey.entity.Survey;
@@ -36,7 +37,7 @@ public class SurveyController {
 	Surveyservice surveyService;
 
 	@GetMapping("/surveys")
-	public List<Survey> retieveSurvey() {
+	public List<SurveyFetchDataDto> retieveSurvey() {
 		return surveyService.findAllSurvey();
 	}
 

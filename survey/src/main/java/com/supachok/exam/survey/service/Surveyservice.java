@@ -1,17 +1,24 @@
 package com.supachok.exam.survey.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.supachok.exam.survey.dto.OptionDto;
+import com.supachok.exam.survey.dto.OptionFetchDataDto;
 import com.supachok.exam.survey.dto.QuestionDto;
+import com.supachok.exam.survey.dto.QuestionFetchDataDto;
 import com.supachok.exam.survey.dto.SurveyDto;
+import com.supachok.exam.survey.dto.SurveyFetchDataDto;
 import com.supachok.exam.survey.entity.Option;
 import com.supachok.exam.survey.entity.Question;
 import com.supachok.exam.survey.entity.Survey;
@@ -31,13 +38,9 @@ public class Surveyservice {
 
 	@Autowired
 	OptionRepository optionRepository;
-
+	
 	@Autowired
 	private ModelMapper modelMapper;
-
-	public List<Survey> findAllSurvey() {
-		return surveyRepository.findAll();
-	}
 
 	public Optional<Survey> findSurveyById(Long surveyId) {
 		return surveyRepository.findById(surveyId);
@@ -101,8 +104,7 @@ public class Surveyservice {
 		if (findQuestion.isEmpty())
 			return Optional.empty();
 		List<Option> options = findQuestion.get().getOptions();
-		Optional<Option> filterOptions = options.stream().filter(
-							option -> option.getId().equals(optionId)).findFirst();
+		Optional<Option> filterOptions = options.stream().filter(option -> option.getId().equals(optionId)).findFirst();
 		return filterOptions;
 	}
 
@@ -110,9 +112,9 @@ public class Surveyservice {
 		options.forEach(option -> {
 			option.setQuestion(question);
 		});
-		
+
 		optionRepository.saveAll(options);
-		
+
 	}
 
 	public void updateOption(Option option, OptionDto optionDto) {
@@ -121,7 +123,7 @@ public class Surveyservice {
 
 	public void deleteOptionById(Long optionId) {
 		optionRepository.deleteById(optionId);
-		
+
 	}
 
 	public HashMap<Long, String> findcorrectAnswer(Survey survey) {
@@ -131,7 +133,39 @@ public class Surveyservice {
 		});
 		return correctAnswers;
 	}
-	
-	
 
+	public List<SurveyFetchDataDto> findAllSurvey() {
+		List<Object[]> results = surveyRepository.findAllSurveysWithQuestionsAndOptions();
+		Map<Long, SurveyFetchDataDto> surveys = new HashMap<>();
+		for (Object[] row : results) {
+			Survey survey = (Survey) row[0];
+			Question question = (Question) row[1];
+			Option option = (Option) row[2];
+			
+			SurveyFetchDataDto surveyDto = new SurveyFetchDataDto();
+			
+			if (!surveys.containsKey(survey.getId())) {
+				BeanUtils.copyProperties(survey, surveyDto);
+				surveys.put(survey.getId(), surveyDto);
+			} 
+			else {
+				surveyDto = surveys.get(survey.getId());
+			}
+
+			if (question != null) {
+				QuestionFetchDataDto questionDto = new QuestionFetchDataDto();
+				BeanUtils.copyProperties(question, questionDto);
+				
+				surveyDto.getQuestions().add(questionDto);
+				
+				if (option != null) {
+					OptionFetchDataDto optionDto = new OptionFetchDataDto();
+					BeanUtils.copyProperties(option, optionDto);
+					
+					questionDto.getOptions().add(optionDto);
+				}
+			}
+		}
+		return new ArrayList<>(surveys.values());
+	}
 }
